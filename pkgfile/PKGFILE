@@ -18,12 +18,13 @@ depends=(
 	# --- Base do VoidBR ---
 	voidbr-base-common    # Base: base-config, utils, NetworkManager, firmware etc.
 	voidbr-wayland-common # Wayland: xwayland, qt-wayland, seatd etc.
-	voidbr-gui-common     # GUI: temas, fontes, pipewire, sddm, polkit-elogind etc.
+	voidbr-gui-common     # GUI: temas, fontes, pipewire, polkit-elogind etc.
 
 	# --- COSMIC (receitas em voidbr-pkgmake/templates) ---
 	cosmic-session        # Sessão; puxa comp, panel, applets, launcher, settings, bg,
 	                      # notifications, osd, idle, randr, screenshot, workspaces,
 	                      # files, icon-theme, greeter e xdg-desktop-portal-cosmic
+	greetd                # Gerenciador de login (tela: cosmic-greeter)
 	cosmic-terminal       # Terminal do COSMIC
 	cosmic-text-editor    # Editor de texto do COSMIC
 	cosmic-player         # Player de mídia do COSMIC
@@ -90,8 +91,11 @@ post_install() {
 			/usr/local/bin/voidbr-copy-skel-inc --user "$user" --force --quiet || true
 		fi
 
+		log "Desativando outros gerenciadores de login"
+		/usr/local/bin/vservice remove sddm lightdm lxdm gdm --quiet || true
+
 		log "Ativando serviços"
-		/usr/local/bin/vservice add sddm --quiet || true
+		/usr/local/bin/vservice add cosmic-greeter-daemon greetd --quiet || true
 	fi
 
 	log "${YELLOW}Instalação completa. Reinicie o sistema...${RESET}"
