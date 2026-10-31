@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🔵 voidbr-pkgfile-template
+# 🔵 voidbr-cosmic
 
-**Template for VoidBR pkgmake/pkgfile packages**
+**VoidBR COSMIC Meta Package**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 

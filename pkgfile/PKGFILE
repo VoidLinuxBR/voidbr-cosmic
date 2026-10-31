@@ -1,7 +1,7 @@
 # Maintainer: Vilmar Catafesta <vcatafesta@gmail.com>
 
-pkgname=voidbr-pkgname
-pkgdesc="Package template for VoidBR"
+pkgname=voidbr-cosmic
+pkgdesc="VoidBR COSMIC Meta Package"
 pkgver=$(date +%Y%m%d)
 pkgrel=$(date +%H%M)
 provides=()  # "eu SOU o $pkgname pkg1, pra quem depender deles"
@@ -14,7 +14,31 @@ url="https://github.com/voidlinuxbr/${pkgname}"
 source=("git+${url}.git")
 md5sums=('SKIP')
 makedepends=()
-depends=()
+depends=(
+	# --- Base do VoidBR ---
+	voidbr-base-common    # Base: base-config, utils, NetworkManager, firmware etc.
+	voidbr-wayland-common # Wayland: xwayland, qt-wayland, seatd etc.
+	voidbr-gui-common     # GUI: temas, fontes, pipewire, sddm, polkit-elogind etc.
+
+	# --- COSMIC (receitas em voidbr-pkgmake/templates) ---
+	cosmic-session        # Sessão; puxa comp, panel, applets, launcher, settings, bg,
+	                      # notifications, osd, idle, randr, screenshot, workspaces,
+	                      # files, icon-theme, greeter e xdg-desktop-portal-cosmic
+	cosmic-terminal       # Terminal do COSMIC
+	cosmic-text-editor    # Editor de texto do COSMIC
+	cosmic-player         # Player de mídia do COSMIC
+	cosmic-viewer         # Visualizador de imagens do COSMIC
+	cosmic-monitor        # Monitor do sistema do COSMIC
+	cosmic-store          # Loja (Flatpak) do COSMIC
+	cosmic-wallpapers     # Papéis de parede do COSMIC
+	cosmic-osk            # Teclado na tela
+
+	# --- Integração ---
+	power-profiles-daemon # Perfis de energia (applet de bateria)
+	accountsservice       # Usuários no cosmic-settings
+	flatpak               # Backend do cosmic-store
+	voidbr-cosmic-config  # Skel config for Void Linux COSMIC Meta Package
+)
 backup=()
 
 # Automatically detect and use the correct install file
@@ -68,9 +92,16 @@ post_install() {
 	fi
 
 	if [ -z "${VOIDBR_INSTALLER:-}" ]; then
-		:
+		if [ -n "$user" ]; then
+			log "Aplicando configuracoes para $user"
+			/usr/local/bin/voidbr-copy-skel-inc --user "$user" --force --quiet || true
+		fi
+
+		log "Ativando serviços"
+		/usr/local/bin/vservice add sddm --quiet || true
 	fi
 
+	log "${YELLOW}Instalação completa. Reinicie o sistema...${RESET}"
 }
 
 pre_upgrade() {
